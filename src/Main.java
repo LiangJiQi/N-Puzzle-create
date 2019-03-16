@@ -4,6 +4,7 @@ public class Main {
 	
 	private int N;				//棋盘状态的边长
 	private int[] board;		//生成状态
+	private int[][] threeBoard;	//取其中的三个状态保存
 	private int[][] hashTable;	//Zobrist hashing用到的hash表
 	private int[] hash;			//每个可解状态的hash值
 	private int hashCount;		//生成棋盘状态个数计数
@@ -24,6 +25,7 @@ public class Main {
 		hashTable = new int[N*N][N*N];							//hash表棋盘状态中每个格所对应的N*N种状态
 		hash = new int[1000];
 		hashCount = 0;
+		threeBoard = new int[N][N*N];
 		
 		//初始化hash表里的值，取32位的随机数
 		boolean flag = true;
@@ -60,6 +62,8 @@ public class Main {
 		
 		
 		generate();
+		System.out.println("1000个可解状态end..........\n\n取其中三种状态和其后续状态：");
+		changePrint(0);
 	}
 	
 	//生成状态函数
@@ -107,8 +111,11 @@ public class Main {
 		//检查生成的可解状态是否已经存在
 		if(hashCheck(temp)) {
 			hash[hashCount++] = temp;
-			if(hashCount == 1 || hashCount == 500 || hashCount == 1000)	//要求输出的的3个初始状态取生成的1000个中的第1，500，1000个状态进行输出
-				changePrint();
+			output(board);
+			if(hashCount == 1 || hashCount == 500 || hashCount == 1000){//要求输出的的3个初始状态取生成的1000个中的第1，500，1000个状态进行输出
+				threeBoard[(int)(hashCount/500)] = board;
+				
+			}
 		}
 		
 	}
@@ -160,16 +167,20 @@ public class Main {
 	
 	
 	//后续状态输出函数
-	public void changePrint() {
+	public void changePrint(int count) {
+		
+		if(count == 3)
+			return;
+		else changePrint(count+1);
 		int[] tempArr = new int[N*N];
 		int zero = -1;
 		for(int i = 0;i < N*N ;i++) {
-			tempArr[i] = board[i];
-			if(board[i] == 0)
+			tempArr[i] = threeBoard[count][i];
+			if(threeBoard[count][i] == 0)
 				zero = i;
 		}
 		//初始状态输出一次
-		output(board);
+		output(threeBoard[count]);
 		
 		//其后续状态
 		System.out.println("该状态的后续状态为：");
